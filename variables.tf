@@ -24,9 +24,9 @@ EOT
     storage_account_type      = string
     synapse_workspace_id      = string
     collation                 = optional(string)
-    create_mode               = optional(string, "Default")
+    create_mode               = optional(string) # Default: "Default"
     data_encrypted            = optional(bool)
-    geo_backup_policy_enabled = optional(bool, true)
+    geo_backup_policy_enabled = optional(bool) # Default: true
     recovery_database_id      = optional(string)
     tags                      = optional(map(string))
     restore = optional(object({
