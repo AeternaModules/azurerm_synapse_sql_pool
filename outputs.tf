@@ -1,3 +1,7 @@
+output "synapse_sql_pools_id" {
+  description = "Map of id values across all synapse_sql_pools, keyed the same as var.synapse_sql_pools"
+  value       = { for k, v in azurerm_synapse_sql_pool.synapse_sql_pools : k => v.id }
+}
 output "synapse_sql_pools_collation" {
   description = "Map of collation values across all synapse_sql_pools, keyed the same as var.synapse_sql_pools"
   value       = { for k, v in azurerm_synapse_sql_pool.synapse_sql_pools : k => v.collation }
