@@ -34,46 +34,22 @@ EOT
       source_database_id = string
     }))
   }))
-  # --- Unconfirmed validation candidates, derived from azurerm_synapse_sql_pool's provider source ---
-  # Not auto-enabled: either a bespoke provider validator we can't safely translate,
-  # or a path that crosses a list-typed block (needs its own for_each wrapping).
-  # Review, translate into a real validation{} block above, and delete once confirmed.
-  # path: name
-  #   source:    [from validate.SqlPoolName] !ok
-  # path: name
-  #   source:    [from validate.SqlPoolName] !regexp.MustCompile(`^[^<>*%&:\\\/?@-]{0,59}[^\s.<>*%&:\\\/?@-]$`).MatchString(v)
-  # path: synapse_workspace_id
-  #   source:    [from validate.WorkspaceID] !ok
-  # path: synapse_workspace_id
-  #   source:    [from validate.WorkspaceID] err != nil
-  # path: sku_name
-  #   condition: contains(["DW100c", "DW200c", "DW300c", "DW400c", "DW500c", "DW1000c", "DW1500c", "DW2000c", "DW2500c", "DW3000c", "DW5000c", "DW6000c", "DW7500c", "DW10000c", "DW15000c", "DW30000c"], value)
-  #   message:   must be one of: DW100c, DW200c, DW300c, DW400c, DW500c, DW1000c, DW1500c, DW2000c, DW2500c, DW3000c, DW5000c, DW6000c, DW7500c, DW10000c, DW15000c, DW30000c
-  # path: storage_account_type
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: create_mode
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: collation
-  #   source:    mssqlValidate.DatabaseCollation: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
-  # path: recovery_database_id
-  #   source:    validation.Any(...) - no translation rule yet, add one
-  # path: restore.point_in_time
-  #   source:    validation.IsRFC3339Time(...) - no translation rule yet, add one
-  # path: restore.source_database_id
-  #   source:    validation.Any(...) - no translation rule yet, add one
-  # path: tags
-  #   condition: length(value) <= 50
-  #   message:   [from tags.Validate: invalid when len(value) > 50]
-  #   source:    [from tags.Validate: invalid when len(value) > 50]
-  # path: tags
-  #   condition: length(value) <= 512
-  #   message:   [from tags.Validate: invalid when len(value) > 512]
-  #   source:    [from tags.Validate: invalid when len(value) > 512]
-  # path: tags
-  #   source:    [from tags.Validate] err != nil
-  # path: tags
-  #   condition: length(value) <= 256
-  #   message:   [from tags.Validate: invalid when len(value) > 256]
-  #   source:    [from tags.Validate: invalid when len(value) > 256]
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_sql_pools : (
+        contains(["DW100c", "DW200c", "DW300c", "DW400c", "DW500c", "DW1000c", "DW1500c", "DW2000c", "DW2500c", "DW3000c", "DW5000c", "DW6000c", "DW7500c", "DW10000c", "DW15000c", "DW30000c"], v.sku_name)
+      )
+    ])
+    error_message = "must be one of: DW100c, DW200c, DW300c, DW400c, DW500c, DW1000c, DW1500c, DW2000c, DW2500c, DW3000c, DW5000c, DW6000c, DW7500c, DW10000c, DW15000c, DW30000c"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_sql_pools : (
+        v.tags == null || (length(v.tags) <= 50)
+      )
+    ])
+    error_message = "[from tags.Validate: invalid when len(value) > 50]"
+  }
+  # Note: 13 additional provider-side validators are enforced at apply time but not mirrored as validation{} blocks here (bespoke or non-mechanically-translatable).
 }
 
