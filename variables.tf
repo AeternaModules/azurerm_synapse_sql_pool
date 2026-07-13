@@ -24,9 +24,9 @@ EOT
     storage_account_type      = string
     synapse_workspace_id      = string
     collation                 = optional(string)
-    create_mode               = optional(string) # Default: "Default"
+    create_mode               = optional(string)
     data_encrypted            = optional(bool)
-    geo_backup_policy_enabled = optional(bool) # Default: true
+    geo_backup_policy_enabled = optional(bool)
     recovery_database_id      = optional(string)
     tags                      = optional(map(string))
     restore = optional(object({
@@ -34,14 +34,6 @@ EOT
       source_database_id = string
     }))
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_sql_pools : (
-        contains(["DW100c", "DW200c", "DW300c", "DW400c", "DW500c", "DW1000c", "DW1500c", "DW2000c", "DW2500c", "DW3000c", "DW5000c", "DW6000c", "DW7500c", "DW10000c", "DW15000c", "DW30000c"], v.sku_name)
-      )
-    ])
-    error_message = "must be one of: DW100c, DW200c, DW300c, DW400c, DW500c, DW1000c, DW1500c, DW2000c, DW2500c, DW3000c, DW5000c, DW6000c, DW7500c, DW10000c, DW15000c, DW30000c"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_synapse_sql_pool's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
@@ -54,6 +46,9 @@ EOT
   #   source:    [from validate.WorkspaceID] !ok
   # path: synapse_workspace_id
   #   source:    [from validate.WorkspaceID] err != nil
+  # path: sku_name
+  #   condition: contains(["DW100c", "DW200c", "DW300c", "DW400c", "DW500c", "DW1000c", "DW1500c", "DW2000c", "DW2500c", "DW3000c", "DW5000c", "DW6000c", "DW7500c", "DW10000c", "DW15000c", "DW30000c"], value)
+  #   message:   must be one of: DW100c, DW200c, DW300c, DW400c, DW500c, DW1000c, DW1500c, DW2000c, DW2500c, DW3000c, DW5000c, DW6000c, DW7500c, DW10000c, DW15000c, DW30000c
   # path: storage_account_type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: create_mode
