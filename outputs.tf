@@ -28,7 +28,7 @@ output "synapse_sql_pools_recovery_database_id" {
 }
 output "synapse_sql_pools_restore" {
   description = "Map of restore values across all synapse_sql_pools, keyed the same as var.synapse_sql_pools"
-  value       = { for k, v in azurerm_synapse_sql_pool.synapse_sql_pools : k => v.restore if v.restore != null && length(v.restore) > 0 }
+  value       = { for k, v in azurerm_synapse_sql_pool.synapse_sql_pools : k => one(v.restore) if v.restore != null && length(v.restore) > 0 }
 }
 output "synapse_sql_pools_sku_name" {
   description = "Map of sku_name values across all synapse_sql_pools, keyed the same as var.synapse_sql_pools"
